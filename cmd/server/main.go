@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"github.com/matthewwangg/go-tcp-server/internal/server/handlers"
 	"log"
 	"net"
 )
@@ -14,20 +14,13 @@ func main() {
 	}
 	defer listener.Close()
 
-	connection, err := listener.Accept()
-	if err != nil {
-		log.Fatal(err)
+	for {
+		connection, err := listener.Accept()
+		if err != nil {
+			log.Fatal(err)
+		}
+		go handlers.HandleConnection(connection)
 	}
-	defer connection.Close()
-
-	buffer := make([]byte, 1024)
-	length, err := connection.Read(buffer)
-	if err != nil {
-		log.Fatal(err)
-	}
-	packet := buffer[:length]
-
-	fmt.Println(string(packet))
 
 	return
 }

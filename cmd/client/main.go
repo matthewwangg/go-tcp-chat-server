@@ -12,7 +12,7 @@ func main() {
 	}
 	defer connection.Close()
 
-	_, err = connection.Write([]byte("Hello from the client!\n"))
+	_, err = connection.Write([]byte("Hello from the client!"))
 	if err != nil {
 		log.Fatal(err)
 	}
