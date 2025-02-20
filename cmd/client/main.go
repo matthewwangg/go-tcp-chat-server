@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/matthewwangg/go-tcp-server/internal/client/handlers"
 	"log"
 	"net"
 )
@@ -16,6 +17,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	handlers.HandleInput(connection)
 
 	return
 }
