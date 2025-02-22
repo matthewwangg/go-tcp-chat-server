@@ -4,30 +4,39 @@ import (
 	"bufio"
 	"log"
 	"net"
+	"strings"
 	"sync"
 )
 
 var Users = make(map[string]net.Conn)
 var Mu sync.Mutex
 
-func HandleLogin(connection net.Conn) {
+func HandleLogin(connection net.Conn) string {
 	buffer := make([]byte, 1024)
+	username := ""
 
 	reader := bufio.NewReader(connection)
-	length, err := reader.Read(buffer)
-	if err != nil {
-		log.Fatal(err)
-	}
-	username := string(buffer[:length])
-	if _, exists := Users[username]; !exists {
-		Mu.Lock()
-		Users[username] = connection
-		Mu.Unlock()
-		_, err = connection.Write([]byte("Connected!"))
+	for {
+		length, err := reader.Read(buffer)
+		if err != nil {
+			log.Fatal(err)
+		}
+		username = strings.TrimSpace(string(buffer[:length]))
+		if _, exists := Users[username]; !exists && username != "" {
+			Mu.Lock()
+			Users[username] = connection
+			Mu.Unlock()
+			_, err = connection.Write([]byte("Connected!"))
+			if err != nil {
+				log.Fatal(err)
+			}
+			break
+		}
+		_, err = connection.Write([]byte("This user is already connected!"))
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	return
+	return username
 }
