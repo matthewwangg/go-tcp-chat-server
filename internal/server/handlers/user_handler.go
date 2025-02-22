@@ -9,7 +9,7 @@ import (
 )
 
 var Users = make(map[string]net.Conn)
-var Mu sync.Mutex
+var MuUsers sync.Mutex
 
 func HandleLogin(connection net.Conn) string {
 	buffer := make([]byte, 1024)
@@ -23,9 +23,9 @@ func HandleLogin(connection net.Conn) string {
 		}
 		username = strings.TrimSpace(string(buffer[:length]))
 		if _, exists := Users[username]; !exists && username != "" {
-			Mu.Lock()
+			MuUsers.Lock()
 			Users[username] = connection
-			Mu.Unlock()
+			MuUsers.Unlock()
 			_, err = connection.Write([]byte("Connected!"))
 			if err != nil {
 				log.Fatal(err)
