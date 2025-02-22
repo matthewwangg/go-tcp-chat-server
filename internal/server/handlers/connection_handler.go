@@ -10,7 +10,7 @@ import (
 func HandleConnection(connection net.Conn) {
 
 	defer connection.Close()
-	HandleLogin(connection)
+	username := HandleLogin(connection)
 	buffer := make([]byte, 1024)
 
 	for {
@@ -23,7 +23,7 @@ func HandleConnection(connection net.Conn) {
 		}
 		packet := buffer[:length]
 
-		fmt.Println(string(packet))
+		fmt.Println(username + ": " + string(packet))
 	}
 
 	return

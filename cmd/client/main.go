@@ -13,11 +13,6 @@ func main() {
 	}
 	defer connection.Close()
 
-	_, err = connection.Write([]byte("Hello from the client!"))
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	handlers.HandleLogin(connection)
 	handlers.HandleInput(connection)
 
