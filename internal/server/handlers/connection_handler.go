@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"strings"
 )
 
 func HandleConnection(connection net.Conn) {
@@ -21,9 +22,13 @@ func HandleConnection(connection net.Conn) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		packet := buffer[:length]
+		packet := strings.TrimSpace(string(buffer[:length]))
+		if packet != "" && packet[0] == '/' {
+			HandleCommand(packet)
+		} else {
+			fmt.Println(username + ": " + packet)
+		}
 
-		fmt.Println(username + ": " + string(packet))
 	}
 
 	return
