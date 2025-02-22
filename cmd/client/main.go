@@ -18,6 +18,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	handlers.HandleLogin(connection)
 	handlers.HandleInput(connection)
 
 	return

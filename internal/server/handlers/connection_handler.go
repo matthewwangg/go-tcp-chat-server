@@ -10,6 +10,7 @@ import (
 func HandleConnection(connection net.Conn) {
 
 	defer connection.Close()
+	HandleLogin(connection)
 	buffer := make([]byte, 1024)
 
 	for {

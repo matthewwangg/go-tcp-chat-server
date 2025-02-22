@@ -21,5 +21,8 @@ func HandleInput(connection net.Conn) {
 			break
 		}
 		_, err = connection.Write([]byte(input))
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
