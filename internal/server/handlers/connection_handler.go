@@ -24,7 +24,7 @@ func HandleConnection(connection net.Conn) {
 		}
 		packet := strings.TrimSpace(string(buffer[:length]))
 		if packet != "" && packet[0] == '/' {
-			HandleCommand(packet)
+			HandleCommand(packet, username)
 		} else {
 			fmt.Println(username + ": " + packet)
 		}
