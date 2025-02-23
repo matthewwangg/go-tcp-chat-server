@@ -6,9 +6,14 @@ import (
 	"sync"
 )
 
+type Room struct {
+	Users map[string]bool
+	Ch    chan string
+}
+
 var UserRoom = make(map[string]string)
 var MuUserRoom sync.RWMutex
-var Rooms = make(map[string]map[string]bool)
+var Rooms = make(map[string]*Room)
 var MuRooms sync.RWMutex
 
 func HandleCommand(cmd string, user string, outgoing chan<- string) {
@@ -32,25 +37,23 @@ func HandleCommand(cmd string, user string, outgoing chan<- string) {
 
 func JoinRoom(room string, user string) {
 	MuUserRoom.RLock()
-	oldRoom, exists := UserRoom[user]
+	_, exists := UserRoom[user]
 	MuUserRoom.RUnlock()
-
-	if exists && oldRoom != room {
-		MuRooms.Lock()
-		delete(Rooms[oldRoom], user)
-		if len(Rooms[oldRoom]) == 0 {
-			delete(Rooms, oldRoom)
-		}
-		MuRooms.Unlock()
+	if exists {
+		LeaveRoom(user)
 	}
 
 	MuRooms.Lock()
-	users, exists := Rooms[room]
+	_, exists = Rooms[room]
 	if !exists {
-		users = make(map[string]bool)
-		Rooms[room] = users
+		Rooms[room] = &Room{
+			Users: make(map[string]bool),
+			Ch:    make(chan string),
+		}
+		go StartRoomListener(room)
 	}
-	users[user] = true
+	roomStruct := Rooms[room]
+	roomStruct.Users[user] = true
 	MuRooms.Unlock()
 
 	MuUserRoom.Lock()
@@ -69,9 +72,10 @@ func LeaveRoom(user string) {
 	}
 
 	MuRooms.Lock()
-	if users, exists := Rooms[room]; exists {
-		delete(users, user)
-		if len(users) == 0 {
+	if roomStruct, exists := Rooms[room]; exists {
+		delete(roomStruct.Users, user)
+		if len(roomStruct.Users) == 0 {
+			close(roomStruct.Ch)
 			delete(Rooms, room)
 		}
 	}
