@@ -18,7 +18,7 @@ func HandleConnection(connection net.Conn) {
 		if message != "" && message[0] == '/' {
 			HandleCommand(message, username, outgoing)
 		} else {
-			HandleMessage(outgoing, message)
+			HandleMessage(message, username, outgoing)
 		}
 	}
 	close(outgoing)

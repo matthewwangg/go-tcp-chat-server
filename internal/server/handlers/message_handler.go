@@ -26,6 +26,18 @@ func WriteToClient(connection net.Conn, outgoing <-chan string) {
 	}
 }
 
-func HandleMessage(outgoing chan<- string, message string) {
-	outgoing <- "You: " + message
+func HandleMessage(message string, user string, outgoing chan<- string) {
+	MuUserRoom.RLock()
+	currentRoom, exists := UserRoom[user]
+	MuUserRoom.RUnlock()
+	if exists {
+		MuRooms.RLock()
+		roomStruct, exists := Rooms[currentRoom]
+		MuRooms.RUnlock()
+		if exists {
+			roomStruct.Ch <- user + ": " + message
+		}
+	} else {
+		outgoing <- "You: " + message
+	}
 }
