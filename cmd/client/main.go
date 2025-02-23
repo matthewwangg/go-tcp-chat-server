@@ -14,6 +14,7 @@ func main() {
 	defer connection.Close()
 
 	handlers.HandleLogin(connection)
+	go handlers.ListenForMessages(connection)
 	handlers.HandleInput(connection)
 
 	return
