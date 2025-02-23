@@ -25,7 +25,7 @@ func main() {
 	go handlers.HandleInput(connection, outgoing, username)
 
 	for message := range incoming {
-		fmt.Print("\033[A\033[K")
+		fmt.Print("\r\033[K")
 		fmt.Println(message)
 		fmt.Print("Input: ")
 	}
