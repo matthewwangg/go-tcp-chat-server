@@ -48,7 +48,7 @@ func JoinRoom(room string, user string) {
 	if !exists {
 		Rooms[room] = &Room{
 			Users: make(map[string]bool),
-			Ch:    make(chan string),
+			Ch:    make(chan string, 10),
 		}
 		go StartRoomListener(room)
 	}
