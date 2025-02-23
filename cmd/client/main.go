@@ -25,7 +25,9 @@ func main() {
 	go handlers.HandleInput(outgoing)
 
 	for message := range incoming {
+		fmt.Print("\033[A\033[K")
 		fmt.Println(message)
+		fmt.Print("Input: ")
 	}
 	close(outgoing)
 	return
