@@ -17,12 +17,12 @@ func main() {
 	outgoing := make(chan string)
 	incoming := make(chan string)
 
-	handlers.HandleLogin(connection)
+	username := handlers.HandleLogin(connection)
 
 	go handlers.ListenForMessages(connection, incoming)
 	go handlers.SendMessages(connection, outgoing)
 
-	go handlers.HandleInput(outgoing)
+	go handlers.HandleInput(connection, outgoing, username)
 
 	for message := range incoming {
 		fmt.Print("\033[A\033[K")

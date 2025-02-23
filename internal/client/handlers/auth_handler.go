@@ -8,11 +8,13 @@ import (
 	"os"
 )
 
-func HandleLogin(connection net.Conn) {
+func HandleLogin(connection net.Conn) string {
 	buffer := make([]byte, 1024)
 
 	stdinReader := bufio.NewReader(os.Stdin)
 	connReader := bufio.NewReader(connection)
+	input := ""
+
 	for {
 		fmt.Print("Username: ")
 		input, err := stdinReader.ReadString('\n')
@@ -35,4 +37,5 @@ func HandleLogin(connection net.Conn) {
 
 	}
 
+	return input
 }
