@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net"
@@ -22,11 +21,11 @@ func HandleConnection(connection net.Conn) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		packet := strings.TrimSpace(string(buffer[:length]))
-		if packet != "" && packet[0] == '/' {
-			HandleCommand(packet, username)
+		message := strings.TrimSpace(string(buffer[:length]))
+		if message != "" && message[0] == '/' {
+			HandleCommand(message, username)
 		} else {
-			fmt.Println(username + ": " + packet)
+			HandleMessage(connection, message)
 		}
 
 	}

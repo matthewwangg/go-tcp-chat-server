@@ -12,7 +12,7 @@ var Rooms = make(map[string]map[string]bool)
 var MuRooms sync.RWMutex
 
 func HandleCommand(cmd string, user string) {
-	fmt.Println(user + "Command: " + cmd)
+	fmt.Println(user + " Command: " + cmd)
 	command := strings.Fields(cmd)
 
 	if command[0] == "/join" && len(command) == 2 {
