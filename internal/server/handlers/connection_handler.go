@@ -1,35 +1,26 @@
 package handlers
 
 import (
-	"io"
-	"log"
 	"net"
-	"strings"
 )
 
 func HandleConnection(connection net.Conn) {
-
 	defer connection.Close()
-	username := HandleLogin(connection)
-	buffer := make([]byte, 1024)
+	incoming := make(chan string)
+	outgoing := make(chan string)
 
-	for {
-		length, err := connection.Read(buffer)
-		if err == io.EOF {
-			return
-		}
-		if err != nil {
-			log.Fatal(err)
-		}
-		message := strings.TrimSpace(string(buffer[:length]))
+	username := HandleLogin(connection)
+
+	go ReadFromClient(connection, incoming)
+	go WriteToClient(connection, outgoing)
+
+	for message := range incoming {
 		if message != "" && message[0] == '/' {
 			HandleCommand(message, username)
 		} else {
-			HandleMessage(connection, message)
+			HandleMessage(outgoing, message)
 		}
-
 	}
-
+	close(outgoing)
 	return
-
 }

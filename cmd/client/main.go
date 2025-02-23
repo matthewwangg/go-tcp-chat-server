@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/matthewwangg/go-tcp-server/internal/client/handlers"
 	"log"
 	"net"
@@ -13,9 +14,19 @@ func main() {
 	}
 	defer connection.Close()
 
-	handlers.HandleLogin(connection)
-	go handlers.ListenForMessages(connection)
-	handlers.HandleInput(connection)
+	outgoing := make(chan string)
+	incoming := make(chan string)
 
+	handlers.HandleLogin(connection)
+
+	go handlers.ListenForMessages(connection, incoming)
+	go handlers.SendMessages(connection, outgoing)
+
+	go handlers.HandleInput(outgoing)
+
+	for message := range incoming {
+		fmt.Println(message)
+	}
+	close(outgoing)
 	return
 }

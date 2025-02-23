@@ -4,14 +4,12 @@ import (
 	"bufio"
 	"fmt"
 	"log"
-	"net"
 	"os"
 	"strings"
 )
 
-func HandleInput(connection net.Conn) {
+func HandleInput(outgoing chan<- string) {
 	reader := bufio.NewReader(os.Stdin)
-	buffer := make([]byte, 1024)
 	for {
 		fmt.Print("Input: ")
 		input, err := reader.ReadString('\n')
@@ -19,20 +17,8 @@ func HandleInput(connection net.Conn) {
 			log.Fatal(err)
 		}
 		if strings.TrimSpace(input) == "/exit" {
-			break
+			return
 		}
-		_, err = connection.Write([]byte(input))
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		if len(input) > 1 && input[0] != '/' {
-			length, err := connection.Read(buffer)
-			if err != nil {
-				log.Fatal(err)
-			}
-			message := strings.TrimSpace(string(buffer[:length]))
-			fmt.Println(message)
-		}
+		outgoing <- strings.TrimSpace(input)
 	}
 }

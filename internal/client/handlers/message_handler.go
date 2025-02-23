@@ -1,23 +1,26 @@
 package handlers
 
 import (
-	"fmt"
-	"log"
 	"net"
-	"strings"
 )
 
-func ListenForMessages(conn net.Conn) {
+func ListenForMessages(connection net.Conn, incoming chan<- string) {
 	buffer := make([]byte, 1024)
 	for {
-		length, err := conn.Read(buffer)
+		length, err := connection.Read(buffer)
 		if err != nil {
-			log.Fatal(err)
+			close(incoming)
+			return
 		}
-		message := strings.TrimSpace(string(buffer[:length]))
-
-		fmt.Println(message)
+		incoming <- string(buffer[:length])
 	}
+}
 
-	return
+func SendMessages(connection net.Conn, outgoing <-chan string) {
+	for message := range outgoing {
+		_, err := connection.Write([]byte(message + "\n"))
+		if err != nil {
+			return
+		}
+	}
 }
