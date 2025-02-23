@@ -10,7 +10,6 @@ import (
 
 func HandleLogin(connection net.Conn) string {
 	buffer := make([]byte, 1024)
-
 	stdinReader := bufio.NewReader(os.Stdin)
 	connReader := bufio.NewReader(connection)
 	input := ""
@@ -34,6 +33,7 @@ func HandleLogin(connection net.Conn) string {
 		if string(response) == "Connected!" {
 			break
 		}
+		fmt.Print("\033[A\033[K")
 
 	}
 
