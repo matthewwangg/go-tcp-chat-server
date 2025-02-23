@@ -11,16 +11,20 @@ var MuUserRoom sync.RWMutex
 var Rooms = make(map[string]map[string]bool)
 var MuRooms sync.RWMutex
 
-func HandleCommand(cmd string, user string) {
+func HandleCommand(cmd string, user string, outgoing chan<- string) {
 	fmt.Println(user + " Command: " + cmd)
 	command := strings.Fields(cmd)
 
 	if command[0] == "/join" && len(command) == 2 {
+		outgoing <- "You joined " + command[1] + "!"
 		JoinRoom(command[1], user)
 	} else if command[0] == "/leave" && len(command) == 1 {
+		prevRoom := UserRoom[user]
 		LeaveRoom(user)
+		outgoing <- "You left " + prevRoom + "!"
 	} else {
-		fmt.Println("Invalid command")
+		fmt.Println("Invalid command " + command[0] + " by " + user)
+		outgoing <- "Invalid command! Please try again!"
 	}
 
 	return
