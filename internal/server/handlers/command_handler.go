@@ -27,6 +27,9 @@ func HandleCommand(cmd string, user string, outgoing chan<- string) {
 		prevRoom := UserRoom[user]
 		LeaveRoom(user)
 		outgoing <- "You left " + prevRoom + "!"
+	} else if command[0] == "/msg" && len(command) == 3 {
+		DirectMessage(user, command[1], command[2])
+		outgoing <- "(To " + command[1] + "): " + command[2]
 	} else {
 		fmt.Println("Invalid command " + command[0] + " by " + user)
 		outgoing <- "Invalid command! Please try again!"
@@ -86,4 +89,14 @@ func LeaveRoom(user string) {
 	MuUserRoom.Unlock()
 
 	return
+}
+
+func DirectMessage(sender string, receiver string, message string) {
+	MuUsers.RLock()
+	connection, exists := Users[receiver]
+	MuUsers.RUnlock()
+
+	if exists {
+		connection.Write([]byte("(From " + sender + "): " + message + "\n"))
+	}
 }
