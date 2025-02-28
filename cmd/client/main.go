@@ -2,13 +2,17 @@ package main
 
 import (
 	"fmt"
+	"github.com/joho/godotenv"
 	"github.com/matthewwangg/go-tcp-server/internal/client/handlers"
 	"log"
 	"net"
 )
 
 func main() {
-	connection, err := net.Dial("tcp", "localhost:8080")
+
+	env, err := godotenv.Read("../../.env")
+
+	connection, err := net.Dial("tcp", env["SERVER_ADDRESS"])
 	if err != nil {
 		log.Fatal(err)
 	}
