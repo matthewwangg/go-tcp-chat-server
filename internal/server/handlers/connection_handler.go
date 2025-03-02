@@ -15,12 +15,15 @@ func HandleConnection(connection net.Conn) {
 	go WriteToClient(connection, outgoing)
 
 	for message := range incoming {
+		UpdateLastSeen(username)
 		if message != "" && message[0] == '/' {
 			HandleCommand(message, username, outgoing)
 		} else {
 			HandleMessage(message, username, outgoing)
 		}
 	}
+
+	RemoveUser(username)
 	close(outgoing)
 	return
 }
