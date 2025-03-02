@@ -32,6 +32,8 @@ func HandleCommand(cmd string, user string, outgoing chan<- string) {
 		outgoing <- "(To " + command[1] + "): " + command[2]
 	} else if command[0] == "/rooms" {
 		ListRooms(outgoing)
+	} else if command[0] == "/users" {
+		ListUsers(outgoing, user)
 	} else {
 		fmt.Println("Invalid command " + command[0] + " by " + user)
 		outgoing <- "Invalid command! Please try again!"
@@ -110,4 +112,17 @@ func ListRooms(outgoing chan<- string) {
 		outgoing <- room
 	}
 	MuRooms.RUnlock()
+}
+
+func ListUsers(outgoing chan<- string, user string) {
+	outgoing <- "Active Users:"
+
+	LastSeen.Range(func(key, value interface{}) bool {
+		otherUser := key.(string)
+		if user != otherUser {
+			outgoing <- otherUser + " last seen at " + GetLastSeen(otherUser)
+		}
+		return true
+	})
+
 }
